@@ -1,0 +1,40 @@
+
+lesson 2
+===================
+```{r}
+getwd()
+setwd("C:/Users/zuoa/Documents/EDA_Course_Materials/EDA_Course_Materials/lesson2")
+reddit<-read.csv('reddit.csv')
+
+str(reddit)
+?table
+table(reddit$employment.status)
+
+summary(reddit)
+
+levels(reddit$age.range)
+
+library(ggplot2)
+qplot(data=reddit, x=age.range)
+
+qplot(data=reddit, x=gender)
+qplot(data=reddit, x=military.service)
+qplot(data=reddit, x=children)
+qplot(data=reddit, x=country)
+qplot(data=reddit, x=state)
+qplot(data=reddit, x=income.range)
+qplot(data=reddit, x=cheese)
+
+levels(reddit$age.range)
+?qplot
+?factor
+?ordered
+
+reddit$age.range <- ordered(reddit$age.range, levels = c("Under 18", "18-24", "25-34", "35-44", "45-54", "55-64", "65 or Above"))
+qplot(data=reddit, x=age.range)
+
+getwd()
+
+```
+
+
