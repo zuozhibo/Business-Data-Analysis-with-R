@@ -1,0 +1,162 @@
+---
+title: "Udacity EDA Lesson 4"
+author: "Alex Zuo"
+date: "April 16, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##scatter plots
+```{r}
+library(ggplot2)
+pf<-read.csv("pseudo_facebook.tsv", sep = "\t")
+
+qplot(x = age, y = friend_count, data = pf)
+qplot(age, friend_count, data = pf)
+
+ggplot(aes(x = age, y = friend_count), data = pf) +
+  geom_point() +
+  xlim(13, 90)
+
+summary(pf$age)
+
+ggplot(aes(x = age, y = friend_count), data = pf) +
+  geom_point(alpha = 1/20) +
+  xlim(13, 90)
+
+ggplot(aes(x = age, y = friend_count), data = pf) +
+  geom_jitter(alpha = 1/20) +
+  xlim(13, 90)
+
+
+
+```
+
+
+##coord_trans
+```{r}
+
+ggplot(aes(x = age, y = friend_count), data = pf) +
+  geom_point(alpha = 1/20, position = position_jitter(h = 0)) +
+  xlim(13, 90)+
+  coord_trans(y = 'sqrt')
+
+```
+
+
+## explore the relationship between friends initiated vs age
+```{r}
+names(pf)
+summary(pf$friendships_initiated)
+
+ggplot(aes(x = age, y = friendships_initiated), data = pf) +
+  geom_jitter(alpha = 1/20, position = position_jitter(h = 0))+
+  xlim(13, 90)+
+  coord_trans(y = 'sqrt')
+
+
+```
+
+
+##conditional means
+```{r}
+library(dplyr)
+
+age_groups <- group_by(pf, age)
+pf.fc_by_age <- summarise(age_groups, 
+                          friend_count_mean = mean(friend_count),
+                          friend_count_median = median(friend_count),
+                          n = n())
+pf.fc_by_age <- arrange(pf.fc_by_age,age)
+head(pf.fc_by_age)
+
+ggplot(aes(x = age, y = friend_count_mean), data = pf.fc_by_age) +
+  geom_point()
+
+ggplot(aes(x = age, y = friend_count_mean), data = pf.fc_by_age) +
+  geom_line()
+
+```
+
+##overlaying summaries with raw data
+```{r}
+
+ggplot(aes(x = age, y = friend_count), data = pf) +
+  geom_point(alpha = 1/20, position = position_jitter(h = 0), color = "orange") +
+  xlim(13, 90)+
+  coord_trans(y = 'sqrt') +
+  geom_line(stat = "summary", fun.y = mean)+
+  geom_line(stat = "summary", fun.y = median)+
+  geom_line(stat = "summary", fun.y = quantile, fun.args = list(probs = .1), 
+            linetype = 2, color = "blue")+
+  geom_line(stat = "summary", fun.y = quantile, fun.args = list(probs = .9), 
+            linetype = 2, color = "blue")
+
+
+```
+
+
+
+##correlation
+```{r}
+cor(pf$age, pf$friend_count)
+?cor.test
+cor.test(pf$age, pf$friend_count, method = "pearson")
+
+?with
+with(subset(pf, age<=70), cor.test(age, friend_count, method = "pearson"))
+
+```
+
+##scatter plot
+```{r}
+names(pf)
+library(ggplot2)
+summary(pf$likes_received)
+
+ggplot(aes(x = www_likes_received, y = likes_received), data = pf) +
+  geom_point(alpha = 1/20)+
+  xlim(0, quantile(pf$www_likes_received, 0.95))+
+  ylim(0, quantile(pf$likes_received, 0.95))+
+  geom_smooth(method = "lm", color = "red")
+
+with(pf, cor.test(www_likes_received, likes_received, method = "pearson"))
+
+```
+
+
+## more caution with correlation
+```{r}
+library(alr3)
+
+data(Mitchell)
+
+names(Mitchell)
+
+ggplot(aes(x = Month, y = Temp), data = Mitchell) +
+  geom_point()
+
+head(Mitchell)
+
+with(Mitchell, cor.test(Month, Temp, method = "pearson"))
+
+range(Mitchell$Month)
+
+ggplot(aes(x = Month, y = Temp), data = Mitchell) +
+  geom_point()+
+  scale_x_discrete(breaks = seq(0, 203, 12))
+
+```
+
+
+
+
+
+
+
+
+
+
